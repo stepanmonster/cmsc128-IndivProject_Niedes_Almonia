@@ -38,10 +38,10 @@ const toast = document.getElementById("toast");
 const toastMsg = document.getElementById("toast-message");
 const toastUndoBtn = document.getElementById("toast-undo");
 
-let renameIndex = null;
-let deleteIndex = null;
-let doneIndex = null;
-let lastDeleted = null;
+let renameIndex = null; //which task is renamed
+let deleteIndex = null; //which task is deleted
+let doneIndex = null; //which task is marked done
+let lastDeleted = null; // store last deleted task for undo
 
 // === API ===
 async function apiList() {
@@ -133,72 +133,70 @@ function renderTodos() {
   }
 
   const now = new Date();
-  const weekFromNow = new Date(now);
-  weekFromNow.setDate(now.getDate() + 7);
-  const monthFromNow = new Date(now);
-  monthFromNow.setMonth(now.getMonth() + 1);
 
-  sortedTodos.forEach((task) => {
-    const li = document.createElement("li");
-    li.className = `task-item ${getPriorityClass(task.priority || "Mid")}`;
+sortedTodos.forEach((task) => {
+  const li = document.createElement("li");
+  li.className = `task-item ${getPriorityClass(task.priority || "Mid")}`;
 
-    const label = document.createElement("label");
+  // ---- Label + Checkbox ----
+  const label = document.createElement("label");
 
-    const cb = document.createElement("input");
-    cb.type = "checkbox";
-    cb.checked = !!task.checked;
+  const cb = document.createElement("input");
+  cb.type = "checkbox";
+  cb.checked = !!task.checked;
 
-    cb.addEventListener("change", () => {
-      const idx = todos.indexOf(task);
-      if (idx !== -1) {
-        doneIndex = idx;
-        openDoneModal(cb,idx);
-      }
-    });
+  cb.addEventListener("change", () => {
+    const idx = todos.indexOf(task);
+    if (idx !== -1) {
+      doneIndex = idx;
+      openDoneModal(cb, idx);
+    }
+  });
 
-    const span = document.createElement("span");
-    span.className = "task-text";
-    span.textContent = task.text;
+  const span = document.createElement("span");
+  span.className = "task-text";
+  span.textContent = task.text;
 
-    label.appendChild(cb);
-    label.appendChild(span);
-    li.appendChild(label);
+  label.appendChild(cb);
+  label.appendChild(span);
+  li.appendChild(label);
 
-    const actions = document.createElement("div");
-    actions.className = "task-actions";
-    actions.innerHTML = `
-      <button class="icon-btn icon-edit" title="Edit"></button>
-      <button class="icon-btn icon-delete" title="Delete"></button>
-    `;
-    actions.querySelector(".icon-edit").addEventListener("click", () => {
-      openRenameModal(todos.indexOf(task));
-    });
-    actions.querySelector(".icon-delete").addEventListener("click", () => {
-      openDeleteModal(todos.indexOf(task));
-    });
+  // ---- Edit/Delete Buttons ----
+  const actions = document.createElement("div");
+  actions.className = "task-actions";
+  actions.innerHTML = `
+    <button class="icon-btn icon-edit" title="Edit"></button>
+    <button class="icon-btn icon-delete" title="Delete"></button>
+  `;
+  actions.querySelector(".icon-edit").addEventListener("click", () => {
+    openRenameModal(todos.indexOf(task));
+  });
+  actions.querySelector(".icon-delete").addEventListener("click", () => {
+    openDeleteModal(todos.indexOf(task));
+  });
 
-    li.appendChild(actions);
+  li.appendChild(actions);
 
-    if (task.checked) {
-      // ✅ Checked = done
-      listDone.appendChild(li);
-    } else {
-      // ✅ Not checked = determine by due date
-   const due = task.date ? new Date(task.date) : null;
-
-    if (task.checked) {
+  // ---- Sorting into Lists ----
+  if (task.checked) {
+    // ✅ Task marked as done
     listDone.appendChild(li);
-    } else if (due) {
-      // Define start (Sunday) and end (Saturday) of this week
+  } else {
+    // ✅ Task not done → sort by due date
+    const due = task.date ? new Date(task.date) : null;
+
+    if (due) {
+      // Week boundaries (Sunday → Saturday)
       const startOfWeek = new Date(now);
-      startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
+      startOfWeek.setDate(now.getDate() - now.getDay());
 
       const endOfWeek = new Date(startOfWeek);
-      endOfWeek.setDate(startOfWeek.getDate() + 6); // Saturday
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of month
+      // Month boundary (last day of current month)
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-      // Remove time part for clean comparison
+      // Normalize due date (strip time)
       const dueDateOnly = new Date(due.getFullYear(), due.getMonth(), due.getDate());
 
       if (dueDateOnly >= startOfWeek && dueDateOnly <= endOfWeek) {
@@ -209,12 +207,13 @@ function renderTodos() {
         listPersonal.appendChild(li);
       }
     } else {
+      // No due date → goes to personal list
       listPersonal.appendChild(li);
     }
+  }
+});
 
 
-    }
-  });
 }
 
 
