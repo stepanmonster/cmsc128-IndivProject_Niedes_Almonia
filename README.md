@@ -1,4 +1,4 @@
-# cmsc128-IndivProject_Niedes_Almonia README
+# cmsc128-IndivProject_Niedes_Almonia
 
 # To-Do Web App
 
