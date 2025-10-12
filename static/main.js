@@ -179,10 +179,10 @@ sortedTodos.forEach((task) => {
 
   // ---- Sorting into Lists ----
   if (task.checked) {
-    // ✅ Task marked as done
+    // Task marked as done
     listDone.appendChild(li);
   } else {
-    // ✅ Task not done → sort by due date
+    // Task not done → sort by due date
     const due = task.date ? new Date(task.date) : null;
 
     if (due) {
