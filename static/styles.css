@@ -3,6 +3,89 @@ html, body {
   padding: 0;
   height: 100%;
 }
+/* Login/Register Page Styles */
+body.auth-page {
+    background-color: #1e1e1e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.auth-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 340px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.auth-container h1 {
+    margin: 0 0 20px 0;
+    font-size: 24px;
+    color: #1e1e1e;
+}
+
+.auth-container label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.auth-container input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 14px;
+    box-sizing: border-box;
+}
+
+.auth-container input:focus {
+    outline: none;
+    border-color: #b694f6;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 10px;
+    background-color: #b694f6;
+    color: black;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+    margin-top: 6px;
+}
+
+.btn-primary:hover {
+    background-color: #d1b9f9;
+}
+
+.toggle-form {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.toggle-form a {
+    color: #b694f6;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.toggle-form a:hover {
+    text-decoration: underline;
+}
+
 
 .parent {
   display: grid;
@@ -23,6 +106,57 @@ html, body {
   border-radius: 12px;
   overflow-y: auto;
   font-family: 'Segoe UI', sans-serif;
+}
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #b694f6, #8b7ac4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    font-size: 18px;
+}
+
+.user-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#user-name {
+    font-weight: 600;
+    color: #f1f1f1;
+    font-size: 14px;
+}
+
+#logout-btn {
+    background: transparent;
+    color: #ff6b6b;
+    border: 1px solid #ff6b6b;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: fit-content;
+}
+
+#logout-btn:hover {
+    background: #ff6b6b;
+    color: white;
 }
 
 .sidebar-header {
