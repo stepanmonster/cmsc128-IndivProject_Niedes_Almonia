@@ -264,6 +264,7 @@ async function changePassword() {
             document.getElementById('input-old-password').value = '';
             document.getElementById('input-new-password').value = '';
             document.getElementById('input-confirm-password').value = '';
+            window.location.href = '/login';
         }
     } catch (err) {
         console.error('Error changing password:', err);
