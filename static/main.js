@@ -75,32 +75,36 @@ async function apiToggle(id) {
 // === INIT ===
 document.addEventListener("DOMContentLoaded", async () => {
   const calendarEl = document.getElementById("calendar");
-  calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "dayGridMonth",
-    height: "100%",
-    events: [],
-  });
-  calendar.render();
 
-  todos = await apiList();
-  rebuildCalendarFromTodos();
-  renderTodos();
-
-  if (sortSelect) {
-    sortSelect.addEventListener("change", renderTodos);
-  }
-
-  if (toastUndoBtn) {
-    toastUndoBtn.addEventListener("click", async () => {
-      if (lastDeleted) {
-        const restored = await apiCreate(lastDeleted);
-        todos.push(restored);
-        rebuildCalendarFromTodos();
-        renderTodos();
-        hideToast();
-        lastDeleted = null;
-      }
+  // Only initialize the task system if we are on the main page
+  if (calendarEl) {
+    calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: "dayGridMonth",
+      height: "100%",
+      events: [],
     });
+    calendar.render();
+
+    todos = await apiList();
+    rebuildCalendarFromTodos();
+    renderTodos();
+
+    if (sortSelect) {
+      sortSelect.addEventListener("change", renderTodos);
+    }
+
+    if (toastUndoBtn) {
+      toastUndoBtn.addEventListener("click", async () => {
+        if (lastDeleted) {
+          const restored = await apiCreate(lastDeleted);
+          todos.push(restored);
+          rebuildCalendarFromTodos();
+          renderTodos();
+          hideToast();
+          lastDeleted = null;
+        }
+      });
+    }
   }
 });
 
@@ -110,6 +114,7 @@ function getPriorityClass(p) {
   if (p === "Low") return "low-priority";
   return "mid-priority";
 }
+
 function renderTodos() {
   listWeek.innerHTML = "";
   listMonth.innerHTML = "";
@@ -129,93 +134,85 @@ function renderTodos() {
     });
   } else if (criteria === "priority") {
     const order = { High: 1, Mid: 2, Low: 3 };
-    sortedTodos.sort((a, b) => (order[a.priority] || 99) - (order[b.priority] || 99));
+    sortedTodos.sort(
+      (a, b) => (order[a.priority] || 99) - (order[b.priority] || 99)
+    );
   }
 
   const now = new Date();
 
-sortedTodos.forEach((task) => {
-  const li = document.createElement("li");
-  li.className = `task-item ${getPriorityClass(task.priority || "Mid")}`;
+  sortedTodos.forEach((task) => {
+    const li = document.createElement("li");
+    li.className = `task-item ${getPriorityClass(task.priority || "Mid")}`;
 
-  // ---- Label + Checkbox ----
-  const label = document.createElement("label");
+    // Label + Checkbox
+    const label = document.createElement("label");
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = !!task.checked;
 
-  const cb = document.createElement("input");
-  cb.type = "checkbox";
-  cb.checked = !!task.checked;
+    cb.addEventListener("change", () => {
+      const idx = todos.indexOf(task);
+      if (idx !== -1) {
+        doneIndex = idx;
+        openDoneModal(cb, idx);
+      }
+    });
 
-  cb.addEventListener("change", () => {
-    const idx = todos.indexOf(task);
-    if (idx !== -1) {
-      doneIndex = idx;
-      openDoneModal(cb, idx);
-    }
-  });
+    const span = document.createElement("span");
+    span.className = "task-text";
+    span.textContent = task.text;
 
-  const span = document.createElement("span");
-  span.className = "task-text";
-  span.textContent = task.text;
+    label.appendChild(cb);
+    label.appendChild(span);
+    li.appendChild(label);
 
-  label.appendChild(cb);
-  label.appendChild(span);
-  li.appendChild(label);
+    // Edit/Delete Buttons
+    const actions = document.createElement("div");
+    actions.className = "task-actions";
+    actions.innerHTML = `
+      <button class="icon-btn icon-edit" title="Edit"></button>
+      <button class="icon-btn icon-delete" title="Delete"></button>
+    `;
+    actions.querySelector(".icon-edit").addEventListener("click", () => {
+      openRenameModal(todos.indexOf(task));
+    });
+    actions.querySelector(".icon-delete").addEventListener("click", () => {
+      openDeleteModal(todos.indexOf(task));
+    });
 
-  // ---- Edit/Delete Buttons ----
-  const actions = document.createElement("div");
-  actions.className = "task-actions";
-  actions.innerHTML = `
-    <button class="icon-btn icon-edit" title="Edit"></button>
-    <button class="icon-btn icon-delete" title="Delete"></button>
-  `;
-  actions.querySelector(".icon-edit").addEventListener("click", () => {
-    openRenameModal(todos.indexOf(task));
-  });
-  actions.querySelector(".icon-delete").addEventListener("click", () => {
-    openDeleteModal(todos.indexOf(task));
-  });
+    li.appendChild(actions);
 
-  li.appendChild(actions);
+    // Sorting into Lists
+    if (task.checked) {
+      listDone.appendChild(li);
+    } else {
+      const due = task.date ? new Date(task.date) : null;
+      if (due) {
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        const dueDateOnly = new Date(
+          due.getFullYear(),
+          due.getMonth(),
+          due.getDate()
+        );
 
-  // ---- Sorting into Lists ----
-  if (task.checked) {
-    // ✅ Task marked as done
-    listDone.appendChild(li);
-  } else {
-    // ✅ Task not done → sort by due date
-    const due = task.date ? new Date(task.date) : null;
-
-    if (due) {
-      // Week boundaries (Sunday → Saturday)
-      const startOfWeek = new Date(now);
-      startOfWeek.setDate(now.getDate() - now.getDay());
-
-      const endOfWeek = new Date(startOfWeek);
-      endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-      // Month boundary (last day of current month)
-      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-      // Normalize due date (strip time)
-      const dueDateOnly = new Date(due.getFullYear(), due.getMonth(), due.getDate());
-
-      if (dueDateOnly >= startOfWeek && dueDateOnly <= endOfWeek) {
-        listWeek.appendChild(li);
-      } else if (dueDateOnly <= endOfMonth) {
-        listMonth.appendChild(li);
+        if (dueDateOnly >= startOfWeek && dueDateOnly <= endOfWeek) {
+          listWeek.appendChild(li);
+        } else if (dueDateOnly <= endOfMonth) {
+          listMonth.appendChild(li);
+        } else {
+          listPersonal.appendChild(li);
+        }
       } else {
         listPersonal.appendChild(li);
       }
-    } else {
-      // No due date → goes to personal list
-      listPersonal.appendChild(li);
     }
-  }
-});
-
-
+  });
 }
-
 
 // === MODAL OPEN ===
 function openRenameModal(index) {
@@ -241,24 +238,20 @@ function openDoneModal(cb, index) {
   const textEl = document.getElementById("doneModalText");
 
   if (cb.checked) {
-    // user checked → confirm done
     titleEl.textContent = "Mark Task as Done";
     textEl.textContent = "Do you want to mark this task as done?";
   } else {
-    // user unchecked → confirm not done
     titleEl.textContent = "Mark Task as Not Done";
     textEl.textContent = "Do you want to mark this task as not done?";
   }
 
-  // revert temporarily so UI doesn’t flip before confirmation
   cb.checked = !cb.checked;
 
   doneTaskConfirmBtn.onclick = () => {
-    toggleTask(index);   // your toggle handles switching state
+    toggleTask(index);
     closeDoneModal();
   };
 }
-
 
 // === MODAL CLOSE ===
 function closeAddModal() {
@@ -272,17 +265,21 @@ function closeDeleteModal() {
 }
 function closeDoneModal() {
   doneModal.style.display = "none";
-  renderTodos(); // restore visual checkbox state
+  renderTodos();
 }
 
 // === TASK LOGIC ===
-addTaskBtn.addEventListener("click", () => addModal.style.display = "flex");
+addTaskBtn?.addEventListener("click", () => (addModal.style.display = "flex"));
 
-addTaskConfirmBtn.addEventListener("click", async () => {
+addTaskConfirmBtn?.addEventListener("click", async () => {
   const text = taskNameInput.value.trim();
   if (!text) return alert("Please enter a task name.");
 
-  const dateTime = taskDateInput.value ? (taskTimeInput.value ? `${taskDateInput.value}T${taskTimeInput.value}` : taskDateInput.value) : "";
+  const dateTime = taskDateInput.value
+    ? taskTimeInput.value
+      ? `${taskDateInput.value}T${taskTimeInput.value}`
+      : taskDateInput.value
+    : "";
 
   const created = await apiCreate({
     text,
@@ -297,11 +294,15 @@ addTaskConfirmBtn.addEventListener("click", async () => {
   renderTodos();
 });
 
-renameTaskConfirmBtn.addEventListener("click", async () => {
+renameTaskConfirmBtn?.addEventListener("click", async () => {
   const newText = renameTaskNameInput.value.trim();
   if (!newText) return alert("Task cannot be empty.");
 
-  const newDateTime = renameTaskDateInput.value ? (renameTaskTimeInput.value ? `${renameTaskDateInput.value}T${renameTaskTimeInput.value}` : renameTaskDateInput.value) : "";
+  const newDateTime = renameTaskDateInput.value
+    ? renameTaskTimeInput.value
+      ? `${renameTaskDateInput.value}T${renameTaskTimeInput.value}`
+      : renameTaskDateInput.value
+    : "";
 
   const id = todos[renameIndex].id;
   const updated = await apiUpdate(id, {
@@ -316,7 +317,7 @@ renameTaskConfirmBtn.addEventListener("click", async () => {
   renderTodos();
 });
 
-deleteTaskConfirmBtn.addEventListener("click", async () => {
+deleteTaskConfirmBtn?.addEventListener("click", async () => {
   const task = todos[deleteIndex];
   lastDeleted = { ...task };
   await apiDelete(task.id);
@@ -341,27 +342,23 @@ function rebuildCalendarFromTodos() {
   calendar.removeAllEvents();
   todos.forEach((t) => {
     if (t.date && !t.checked) {
-    calendar.addEvent({
-      title: formatTitleWithTime(t.text, t.date),
-      start: t.date,
-      allDay: true,  // always display as full-day
-      color: PRIORITY_COLORS[t.priority || "Mid"],
-    });
-
-
+      calendar.addEvent({
+        title: formatTitleWithTime(t.text, t.date),
+        start: t.date,
+        allDay: true,
+        color: PRIORITY_COLORS[t.priority || "Mid"],
+      });
     }
   });
 }
+
 function formatTitleWithTime(text, datetimeStr) {
   if (!datetimeStr || !datetimeStr.includes("T")) return text;
-
   const [datePart, timePart] = datetimeStr.split("T");
   const time = new Date(`${datePart}T${timePart}`);
-  const options = { hour: 'numeric', minute: '2-digit', hour12: true };
-
+  const options = { hour: "numeric", minute: "2-digit", hour12: true };
   return `${text} – ${time.toLocaleTimeString([], options)}`;
 }
-
 
 // === TOAST ===
 function showToast(msg) {
@@ -372,4 +369,37 @@ function showToast(msg) {
 }
 function hideToast() {
   toast.classList.remove("show");
+}
+
+// -------- LOGIN PAGE LOGIC --------
+if (document.getElementById("login-confirm")) {
+  const loginBtn = document.getElementById("login-confirm");
+
+  loginBtn.addEventListener("click", () => {
+    const credentials = document
+      .getElementById("login-credentials")
+      .value.trim();
+    const password = document.getElementById("login-password").value.trim();
+
+    if (!credentials || !password) {
+      alert("Please fill in both fields.");
+      return;
+    }
+
+    fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credentials, password }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          alert(`Welcome back, ${data.user.username}!`);
+          window.location.href = "/tasks"; // redirect to main page
+        }
+      })
+      .catch((err) => console.error("Login error:", err));
+  });
 }
