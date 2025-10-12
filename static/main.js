@@ -38,10 +38,10 @@ const toast = document.getElementById("toast");
 const toastMsg = document.getElementById("toast-message");
 const toastUndoBtn = document.getElementById("toast-undo");
 
-let renameIndex = null;
-let deleteIndex = null;
-let doneIndex = null;
-let lastDeleted = null;
+let renameIndex = null; //which task is renamed
+let deleteIndex = null; //which task is deleted
+let doneIndex = null; //which task is marked done
+let lastDeleted = null; // store last deleted task for undo
 
 // === API ===
 async function apiList() {
