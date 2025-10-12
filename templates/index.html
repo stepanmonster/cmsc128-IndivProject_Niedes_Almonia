@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Account Settings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body style="background-color: #1e1e1e; padding: 20px;">
+    <div class="settings-container">
+        <!-- Logout Button in Top Right -->
+        
+        <div class="settings-header">
+            <h1>Account Settings</h1>
+            <button class="btn-logout" onclick="logoutUser()">Logout</button>
+        </div>
+
+
+        <div class="settings-grid">
+            <!-- Profile Details Card -->
+            <div class="settings-card">
+                <h2>Profile Details</h2>
+                
+                <div class="profile-section">
+                    <div class="profile-avatar" id="avatar-display">
+                        <span id="avatar-initial">U</span>
+                    </div>
+                </div>
+
+                <!-- Full Name Field -->
+                <div class="info-group">
+                    <div class="info-label">Full Name</div>
+                    <div class="editable-field">
+                        <span class="field-text" id="display-name">Loading...</span>
+                        <span class="edit-icon" onclick="editField('name')">✏️</span>
+                    </div>
+                </div>
+
+                <!-- Username Field -->
+                <div class="info-group">
+                    <div class="info-label">Username</div>
+                    <div class="editable-field">
+                        <span class="field-text" id="display-username">Loading...</span>
+                        <span class="edit-icon" onclick="editField('username')">✏️</span>
+                    </div>
+                </div>
+
+                <!-- Email Field (Read-only) -->
+                <div class="info-group">
+                    <div class="info-label">Email</div>
+                    <div class="editable-field">
+                        <span class="field-text" id="display-email" style="opacity: 0.6;">No email</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Change Password Card -->
+            <div class="settings-card">
+                <h2>Change Password</h2>
+                <p class="card-description">Update your password to keep your account secure.</p>
+                
+                <div class="info-group">
+                    <div class="info-label">Old Password</div>
+                    <input type="password" class="info-input" id="input-old-password" placeholder="Enter current password">
+                </div>
+
+                <div class="info-group">
+                    <div class="info-label">New Password</div>
+                    <input type="password" class="info-input" id="input-new-password" placeholder="Enter new password (min 6 characters)">
+                </div>
+
+                <div class="info-group">
+                    <div class="info-label">Confirm New Password</div>
+                    <input type="password" class="info-input" id="input-confirm-password" placeholder="Confirm new password">
+                </div>
+
+                <button class="btn-primary" onclick="changePassword()">Update Password</button>
+            </div>
+        </div>
+
+        <!-- Close Account Card -->
+        <div class="settings-card" style="margin-top: 20px;">
+            <h2>Close Account</h2>
+            <p class="card-description">You can permanently delete your account. This action cannot be undone.</p>
+            <button class="btn-danger" onclick="confirmDeleteAccount()">Delete Account</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='login.js') }}"></script>
+</body>
+</html>
