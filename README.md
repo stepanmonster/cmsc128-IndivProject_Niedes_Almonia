@@ -12,7 +12,8 @@ This project uses **Flask** (Python) as the backend framework with **SQLite** as
    ```
 
 2. Run the Flask backend:
-   run app.py
+   run app.py for the to-do list
+   run account.py for the user account manager
 
 3. Open the localhost:5000 in your browser.
 
@@ -32,6 +33,21 @@ Here are some example endpoints that the frontend can use to interact with the d
 - **Delete a task**
   ```http
   DELETE /tasks/<id>
+  ```
+
+- **Create a user**
+  ```
+  PUT /api/user
+  ```
+  
+- **Verify user answer to security question**
+  ```
+  POST /api/user/verify-security-answer
+  ```
+
+- **Request password reset via forgot password**
+  ```
+  POST /api/reset-password
   ```
 
 These endpoints allow the frontend to retrieve, insert, and remove data from the SQLite database through the Flask backend.
