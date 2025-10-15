@@ -16,42 +16,53 @@
 
 
         <div class="settings-grid">
-            <!-- Profile Details Card -->
-            <div class="settings-card">
-                <h2>Profile Details</h2>
-                
-                <div class="profile-section">
-                    <div class="profile-avatar" id="avatar-display">
-                        <span id="avatar-initial">U</span>
-                    </div>
-                </div>
-
-                <!-- Full Name Field -->
-                <div class="info-group">
-                    <div class="info-label">Full Name</div>
-                    <div class="editable-field">
-                        <span class="field-text" id="display-name">Loading...</span>
-                        <span class="edit-icon" onclick="editField('name')">✏️</span>
-                    </div>
-                </div>
-
-                <!-- Username Field -->
-                <div class="info-group">
-                    <div class="info-label">Username</div>
-                    <div class="editable-field">
-                        <span class="field-text" id="display-username">Loading...</span>
-                        <span class="edit-icon" onclick="editField('username')">✏️</span>
-                    </div>
-                </div>
-
-                <!-- Email Field (Read-only) -->
-                <div class="info-group">
-                    <div class="info-label">Email</div>
-                    <div class="editable-field">
-                        <span class="field-text" id="display-email" style="opacity: 0.6;">No email</span>
-                    </div>
+        <!-- Profile Details Card -->
+        <div class="settings-card">
+            <h2>Profile Details</h2>
+            
+            <div class="profile-section">
+                <div class="profile-avatar" id="avatar-display">
+                    <span id="avatar-initial">U</span>
                 </div>
             </div>
+
+            <!-- Full Name Field -->
+            <div class="info-group">
+                <div class="info-label">Full Name</div>
+                <div class="editable-field" id="name-field">
+                    <span class="field-text" id="display-name">Loading...</span>
+                    <input type="text" class="field-input" id="input-name" style="display: none;">
+                    <span class="edit-icon" onclick="editField('name')">✏️</span>
+                    <span class="save-icon" onclick="saveField('name')" style="display: none;">✓</span>
+                    <span class="cancel-icon" onclick="cancelEdit('name')" style="display: none;">✕</span>
+                </div>
+            </div>
+
+            <!-- Username Field -->
+            <div class="info-group">
+                <div class="info-label">Username</div>
+                <div class="editable-field" id="username-field">
+                    <span class="field-text" id="display-username">Loading...</span>
+                    <input type="text" class="field-input" id="input-username" style="display: none;">
+                    <span class="edit-icon" onclick="editField('username')">✏️</span>
+                    <span class="save-icon" onclick="saveField('username')" style="display: none;">✓</span>
+                    <span class="cancel-icon" onclick="cancelEdit('username')" style="display: none;">✕</span>
+                </div>
+            </div>
+
+            <!-- Email Field -->
+            <div class="info-group">
+                <div class="info-label">Email</div>
+                <div class="editable-field" id="email-field">
+                    <span class="field-text" id="display-email">Loading...</span>
+                    <input type="email" class="field-input" id="input-email" style="display: none;">
+                    <span class="edit-icon" onclick="editField('email')">✏️</span>
+                    <span class="save-icon" onclick="saveField('email')" style="display: none;">✓</span>
+                    <span class="cancel-icon" onclick="cancelEdit('email')" style="display: none;">✕</span>
+                </div>
+            </div>
+        </div>
+
 
             <!-- Change Password Card -->
             <div class="settings-card">
@@ -76,14 +87,6 @@
                 <button class="btn-primary" onclick="changePassword()">Update Password</button>
             </div>
         </div>
-
-        <!-- Close Account Card -->
-        <div class="settings-card" style="margin-top: 20px;">
-            <h2>Close Account</h2>
-            <p class="card-description">You can permanently delete your account. This action cannot be undone.</p>
-            <button class="btn-danger" onclick="confirmDeleteAccount()">Delete Account</button>
-        </div>
-    </div>
 
     <script src="{{ url_for('static', filename='login.js') }}"></script>
 </body>

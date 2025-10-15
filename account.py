@@ -186,7 +186,7 @@ def create_user():
 
 @app.put("/api/user")
 def update_user():
-    """Update user profile (name and username)"""
+    """Update user profile (name, username, and email)"""
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({"error": "Not logged in"}), 401
@@ -198,9 +198,13 @@ def update_user():
     data = request.get_json(force=True)
     new_name = data.get("name", "").strip()
     new_username = data.get("username", "").strip()
+    new_email_value = data.get("email")
+    new_email = new_email_value.strip() if new_email_value else None
     
+    # Validation
     if not new_name:
         return jsonify({"error": "Name is required"}), 400
+    
     if not new_username:
         return jsonify({"error": "Username is required"}), 400
     
@@ -210,11 +214,21 @@ def update_user():
         if existing:
             return jsonify({"error": "Username already taken"}), 400
     
+    # Check if email is taken by someone else
+    if new_email and new_email != user.u_email:
+        existing_email = User.query.filter_by(u_email=new_email).first()
+        if existing_email:
+            return jsonify({"error": "Email already taken"}), 400
+    
+    # Update fields
     user.u_name = new_name
     user.u_username = new_username
+    user.u_email = new_email
+    
     db.session.commit()
     
     return jsonify({"message": "Profile updated successfully", "user": user.to_dict()}), 200
+
 
 @app.put("/api/user/password")
 def change_password():
