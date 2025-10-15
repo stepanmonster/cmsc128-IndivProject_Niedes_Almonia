@@ -57,36 +57,28 @@ if (document.getElementById("register-confirm")) {
         const password = document.getElementById("register-password").value.trim();
         const confirmPassword = document.getElementById("register-confirm-password").value.trim();
         const name = document.getElementById("register-name").value.trim();
-        
+        const question_id = document.getElementById("security-question").value;
+        const answer = document.getElementById("security-answer").value.trim();
+
         // Validation
-        if (!credentials) {
-            alert("Username or email is required.");
+        if (!credentials || !password || !confirmPassword || !name || !question_id || !answer) {
+            alert("Please fill in all required fields.");
             return;
         }
-        
-        if (!password) {
-            alert("Password is required.");
-            return;
-        }
-        
+
         if (password !== confirmPassword) {
             alert("Passwords do not match.");
             return;
         }
-        
+
         if (password.length < 6) {
             alert("Password must be at least 6 characters long.");
             return;
         }
-        
-        if (!name) {
-            alert("Full name is required.");
-            return;
-        }
-        
-        // Detect if email or username
+
+        // Detect email vs username
         const isEmail = credentials.includes("@");
-        
+
         try {
             const response = await fetch("/api/user", {
                 method: "POST",
@@ -95,17 +87,17 @@ if (document.getElementById("register-confirm")) {
                     username: isEmail ? credentials.split("@")[0] : credentials,
                     email: isEmail ? credentials : null,
                     name: name,
-                    password: password
+                    password: password,
+                    security_answer: { question_id, answer }  // send both question and answer
                 }),
             });
-            
+
             const data = await response.json();
-            
+
             if (data.error) {
                 alert(data.error);
-                console.log("Error details:", data.error);
             } else {
-                alert(`Account created successfully! Welcome, ${data.username}!`);
+                alert(`Account created successfully! Welcome, ${data.username || data.name}!`);
                 window.location.href = "/index";
             }
         } catch (err) {
@@ -306,3 +298,43 @@ function confirmDeleteAccount() {
         });
     }
 }
+
+// ============== FORGOT PASSWORD FUNCTIONALITY ====================
+
+document.addEventListener("DOMContentLoaded", function() {
+    const forgotBtn = document.getElementById("forgot-password");
+    if (forgotBtn) {
+        forgotBtn.addEventListener("click", function() {
+            // Redirect to the Flask route
+            window.location.href = "/forgotpassword";
+        });
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const questionSelect = document.getElementById("security-question");
+    const registerBtn = document.getElementById("register-confirm");
+
+    if (questionSelect && registerBtn) {
+        fetch("/api/security-questions")
+        .then(res => res.json())
+        .then(data => {
+            // Clear default option
+            questionSelect.innerHTML = "";
+            
+            data.forEach(q => {
+                const option = document.createElement("option");
+                option.value = q.q_id;
+                option.textContent = q.q_content;
+                questionSelect.appendChild(option);
+            });
+
+            // Enable Sign Up button after questions loaded
+            registerBtn.disabled = false;
+        })
+        .catch(err => {
+            console.error("Failed to load security questions:", err);
+            questionSelect.innerHTML = "<option value=''>Failed to load questions</option>";
+        });
+    }
+});
