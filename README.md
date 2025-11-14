@@ -50,4 +50,16 @@ Here are some example endpoints that the frontend can use to interact with the d
   POST /api/reset-password
   ```
 
+- **Create new collaborative list**
+  ```
+  POST /api/collaborative-lists
+  ```
+
+- **Delete a collaborative list**
+  ```
+  DELETE /api/collaborative-lists/<list_id>
+  ```
+  
+  
+
 These endpoints allow the frontend to retrieve, insert, and remove data from the SQLite database through the Flask backend.
