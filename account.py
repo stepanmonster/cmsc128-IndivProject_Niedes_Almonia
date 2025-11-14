@@ -47,7 +47,7 @@ class UserSecurityAnswer(db.Model):
     user = db.relationship("User", back_populates="security_answers")
     question = db.relationship("SecurityQuestions", back_populates="answers")
 
-
+# to do list with collaboration feature
 class CollaborativeList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
@@ -58,7 +58,7 @@ class CollaborativeList(db.Model):
     members = db.relationship("ListMember", back_populates="list", cascade="all, delete-orphan")
     tasks = db.relationship("CollaborativeTask", back_populates="list", cascade="all, delete-orphan")
 
-
+# member of collaborative list
 class ListMember(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     list_id = db.Column(db.Integer, db.ForeignKey("collaborative_list.id"), nullable=False)
@@ -68,7 +68,7 @@ class ListMember(db.Model):
     list = db.relationship("CollaborativeList", back_populates="members")
     user = db.relationship("User")
 
-
+# class for collaborative tasks
 class CollaborativeTask(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     list_id = db.Column(db.Integer, db.ForeignKey("collaborative_list.id"), nullable=False)
