@@ -288,20 +288,49 @@ async function handleDeleteList() {
 }
 
 async function handleAddMember() {
-  const user = $("member-username-input").value.trim();
-  const err = $("member-error-message"), succ = $("member-success-message");
-  err.style.display = succ.style.display = "none";
-  if (!user) { err.textContent = "Please enter a username"; err.style.display = "block"; return; }
+  const username = document.getElementById("member-username-input").value.trim();
+  const errorEl = document.getElementById("member-error-message");
+  const successEl = document.getElementById("member-success-message");
+
+  errorEl.style.display = "none";
+  successEl.style.display = "none";
+
+  if (!username) {
+    errorEl.textContent = "Please enter a username";
+    errorEl.style.display = "block";
+    return;
+  }
+
   try {
-    const res = await collabAPI.members.add(state.currentCollaborativeList.id, user);
-    if (res.error) { err.textContent = res.error; err.style.display = "block"; return; }
-    $("member-username-input").value = "";
-    succ.textContent = `${user} added successfully!`;
-    succ.style.display = "block";
-    setTimeout(() => succ.style.display = "none", 3000);
+    // call fetch directly so we can inspect status
+    const res = await fetch(`/api/collaborative-lists/${state.currentCollaborativeList.id}/members`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      // backend already sends messages like "User not found", "User is already a member", etc.
+      errorEl.textContent = data.error || "Failed to add member";
+      errorEl.style.display = "block";
+      return;
+    }
+
+    // success path
+    document.getElementById("member-username-input").value = "";
+    successEl.textContent = `${username} added successfully!`;
+    successEl.style.display = "block";
+    setTimeout(() => (successEl.style.display = "none"), 3000);
     await loadMembersForModal(state.currentCollaborativeList.id);
-  } catch (e) { console.error(e); err.textContent = "Failed to add member"; err.style.display = "block"; }
+  } catch (err) {
+    console.error("Error adding member:", err);
+    errorEl.textContent = "Failed to add member";
+    errorEl.style.display = "block";
+  }
 }
+
 
 async function handleAddTask() {
   const text = $("task-name").value.trim();
