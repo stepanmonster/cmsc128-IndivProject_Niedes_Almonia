@@ -610,64 +610,37 @@ async function loadUserProfile() {
   } catch (e) { console.error(e); }
 }
 
-const mobileMenuBtn = document.getElementById('mobile-menu-toggle');
-const sidebar = document.querySelector('.sidebar');
+const overlay = document.createElement('div');
+overlay.className = 'sidebar-overlay';
+document.body.appendChild(overlay);
 
-if (mobileMenuBtn) {
-  // Create overlay
-  const overlay = document.createElement('div');
-  overlay.className = 'sidebar-overlay';
-  document.body.appendChild(overlay);
-  
-  // Toggle sidebar
-  mobileMenuBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('mobile-visible');
-    overlay.classList.toggle('active');
-  });
-  
-  // Close sidebar when clicking overlay
-  overlay.addEventListener('click', function() {
-    sidebar.classList.remove('mobile-visible');
-    overlay.classList.remove('active');
-  });
-  
-  // Close sidebar when switching views
-  document.getElementById('nav-personal')?.addEventListener('click', function() {
-    sidebar.classList.remove('mobile-visible');
-    overlay.classList.remove('active');
-  });
-  
-  document.getElementById('nav-collaborative')?.addEventListener('click', function() {
-    sidebar.classList.remove('mobile-visible');
-    overlay.classList.remove('active');
-  });
-}
-
+// Helper function - checks for mobile
 function isMobile() {
   return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
+// Helper function to show sidebar on mobile
 function openSidebarOnMobile() {
   if (isMobile()) {
     const sidebar = document.querySelector('.sidebar');
-    const overlay = document.querySelector('.sidebar-overlay');
     if (sidebar && overlay) {
       sidebar.style.display = 'block';
       sidebar.style.position = 'fixed';
       sidebar.style.left = '0';
       sidebar.style.zIndex = '999';
-      
       overlay.classList.add('active');
     }
   }
 }
 
-
-document.querySelector('.sidebar-overlay')?.addEventListener('click', function() {
+// Close sidebar when clicking overlay
+overlay.addEventListener('click', function() {
   const sidebar = document.querySelector('.sidebar');
-  const overlay = document.querySelector('.sidebar-overlay');
   if (sidebar && overlay) {
     sidebar.style.left = '-100%';
+    setTimeout(() => {
+      sidebar.style.display = '';
+    }, 300); // Wait for transition
     overlay.classList.remove('active');
   }
 });
