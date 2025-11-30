@@ -643,8 +643,12 @@ if (mobileMenuBtn) {
   });
 }
 
+function isMobile() {
+  return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
 function openSidebarOnMobile() {
-  if (window.innerWidth <= 768) {
+  if (isMobile()) {
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.querySelector('.sidebar-overlay');
     if (sidebar && overlay) {
