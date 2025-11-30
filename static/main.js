@@ -643,10 +643,27 @@ if (mobileMenuBtn) {
   });
 }
 
+function openSidebarOnMobile() {
+  if (window.innerWidth <= 768) {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (sidebar && overlay) {
+      sidebar.classList.add('mobile-visible');
+      overlay.classList.add('active');
+    }
+  }
+}
+
 // Setup
 function setup() {
-  $("nav-personal")?.addEventListener("click", () => switchView("personal"));
-  $("nav-collaborative")?.addEventListener("click", () => switchView("collaborative"));
+  $("nav-personal")?.addEventListener("click", () => {
+    switchView("personal");
+    openSidebarOnMobile();
+  });
+  $("nav-collaborative")?.addEventListener("click", () => {
+    switchView("collaborative");
+    openSidebarOnMobile();
+  });
   $("create-list-btn")?.addEventListener("click", () => modal.show("create-list-modal"));
   $("create-list-cancel")?.addEventListener("click", () => modal.hide("create-list-modal"));
   $("create-list-confirm")?.addEventListener("click", handleCreateList);

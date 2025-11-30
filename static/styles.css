@@ -420,7 +420,23 @@ body.auth-page {
   body {
     overflow: hidden;
   }
+
+    .nav-avatar {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 18px !important;
+    flex-shrink: 0;
+  }
   
+  .left-sidebar {
+    padding-right: 0.75rem !important; /* More padding on right */
+  }
+  
+  .bottom-nav {
+    flex-shrink: 0;
+    margin-right: 0.25rem;
+  }
+
   .parent {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
