@@ -3,7 +3,17 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
+
 app = Flask(__name__)
+@app.after_request
+def add_header(response):
+    response.cache_control.no_store = True
+    response.cache_control.no_cache = True
+    response.cache_control.must_revalidate = True
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.secret_key = "13c4f3f7e6f6ff70a262eae263c51b8c"
@@ -93,7 +103,7 @@ with app.app_context():
 # ---------- PAGE ROUTES ----------
 @app.route("/")
 def root():
-    if 'user_id' in session:
+    if 'user_id' in      session:
         return redirect(url_for('index_page'))
     return render_template("login.html")
 
