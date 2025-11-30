@@ -407,39 +407,37 @@ body.auth-page {
   padding: 0;
 }
 
-/* Mobile responsive layout */
+.mobile-fab {
+  display: none;
+}
+
 @media (max-width: 768px) {
-  .parent {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-  }
-  
-  .left-sidebar {
-    flex-direction: row !important;
-    padding: 0.5rem !important;
-    border-right: none !important;
-    border-bottom: 1px solid #2b2b2b;
-    justify-content: space-between !important;
-  }
-  
-  .nav-items {
-    flex-direction: row !important;
-    gap: 0.5rem !important;
-  }
-  
-  .sidebar {
-    display: none;
-  }
-  
-  .sidebar.mobile-visible {
-    display: block;
+  .mobile-fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 80vw;
-    max-width: 320px;
-    height: 100vh;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 56px;
+    height: 56px;
+    background: #b694f6;
+    color: black;
+    border: none;
+    border-radius: 50%;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(182, 148, 246, 0.4);
     z-index: 1000;
+    transition: all 0.2s;
+  }
+  
+  .mobile-fab:hover,
+  .mobile-fab:active {
+    background: #d1b9f9;
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(182, 148, 246, 0.6);
   }
 }
 
