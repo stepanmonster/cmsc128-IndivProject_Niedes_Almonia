@@ -407,6 +407,10 @@ body.auth-page {
   padding: 0;
 }
 
+.mobile-menu-btn {
+  display: none;
+}
+
 .mobile-fab {
   display: none;
 }
