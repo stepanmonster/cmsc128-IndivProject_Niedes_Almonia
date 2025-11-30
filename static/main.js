@@ -625,6 +625,7 @@ function setup() {
   $("add-member-btn")?.addEventListener("click", handleAddMember);
   $("left-profile-btn")?.addEventListener("click", () => window.location.href = '/settings');
   $("add-task-btn")?.addEventListener("click", () => modal.show("add-task-modal"));
+  $("mobile-add-task-btn")?.addEventListener("click", () => modal.show("add-task-modal"));
   $("add-task-cancel")?.addEventListener("click", closeAddModal);
   $("rename-task-cancel")?.addEventListener("click", closeRenameModal);
   $("delete-task-cancel")?.addEventListener("click", closeDeleteModal);
