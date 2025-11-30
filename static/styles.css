@@ -770,7 +770,7 @@ section h3 {
 }
 
 .modal h2 {
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.75rem 0; 
   font-size: clamp(16px, 4vw, 20px);
   color: #333;
 }
@@ -783,7 +783,9 @@ section h3 {
   color: #333;
 }
 
-.modal input,
+.modal input[type="text"],
+.modal input[type="date"],
+.modal input[type="time"],
 .modal select,
 .modal textarea {
   padding: 0.625rem;
@@ -793,7 +795,9 @@ section h3 {
   width: 100%;
   box-sizing: border-box;
   font-family: 'Segoe UI', sans-serif;
+  margin-bottom: 0.75rem; /* Add spacing between fields */
 }
+
 
 .modal input:focus,
 .modal select:focus,
@@ -864,6 +868,7 @@ section h3 {
     border-bottom: 1px solid #2b2b2b;
     justify-content: space-between !important;
     width: 100%;
+    height: auto !important;
   }
   
   .app-icon {
@@ -880,10 +885,7 @@ section h3 {
     margin-top: 0 !important;
     padding-top: 0 !important;
     border-top: none !important;
-  }
-  
-  .sidebar {
-    display: none;
+    margin-left: auto;
   }
   
   /* Main content should fill remaining space */
@@ -892,7 +894,53 @@ section h3 {
     height: 100%;
     padding: 1rem;
   }
+  
+  /* Mobile menu toggle button */
+  .mobile-menu-btn {
+    display: block;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0.5rem;
+  }
+  
+  /* Sidebar overlay for mobile */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+  }
+  
+  .sidebar-overlay.active {
+    display: block;
+  }
+  
+  /* Sidebar slides in from left on mobile */
+  .sidebar {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 80vw;
+    max-width: 320px;
+    height: 100vh;
+    z-index: 999;
+    transition: left 0.3s ease;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .sidebar.mobile-visible {
+    left: 0;
+  }
 }
+
 
 /* ========== CALENDAR MOBILE FIX ========== */
 

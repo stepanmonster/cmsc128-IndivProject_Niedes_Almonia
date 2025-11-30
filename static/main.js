@@ -610,6 +610,39 @@ async function loadUserProfile() {
   } catch (e) { console.error(e); }
 }
 
+const mobileMenuBtn = document.getElementById('mobile-menu-toggle');
+const sidebar = document.querySelector('.sidebar');
+
+if (mobileMenuBtn) {
+  // Create overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'sidebar-overlay';
+  document.body.appendChild(overlay);
+  
+  // Toggle sidebar
+  mobileMenuBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('mobile-visible');
+    overlay.classList.toggle('active');
+  });
+  
+  // Close sidebar when clicking overlay
+  overlay.addEventListener('click', function() {
+    sidebar.classList.remove('mobile-visible');
+    overlay.classList.remove('active');
+  });
+  
+  // Close sidebar when switching views
+  document.getElementById('nav-personal')?.addEventListener('click', function() {
+    sidebar.classList.remove('mobile-visible');
+    overlay.classList.remove('active');
+  });
+  
+  document.getElementById('nav-collaborative')?.addEventListener('click', function() {
+    sidebar.classList.remove('mobile-visible');
+    overlay.classList.remove('active');
+  });
+}
+
 // Setup
 function setup() {
   $("nav-personal")?.addEventListener("click", () => switchView("personal"));
