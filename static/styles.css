@@ -1035,33 +1035,31 @@ section h3 {
   z-index: 9999;
   padding: 1rem;
   overflow-y: auto;
-  box-sizing: border-box; /* ADDED */
+  box-sizing: border-box;
 }
-
 
 .modal {
   background-color: white;
-  padding: 1.5rem; /* CHANGED from 1.25rem */
+  padding: 1.5rem;
   border-radius: 10px;
   width: 100%;
   max-width: 400px;
-  min-width: min(280px, 90vw);
+  min-width: 280px;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   max-height: 90vh;
   overflow-y: auto;
+  overflow-x: hidden; /* ADDED */
   margin: auto;
-  box-sizing: border-box; /* ADDED */
+  box-sizing: border-box;
 }
-
 
 .modal h2 {
   margin: 0 0 1rem 0;
-  font-size: clamp(18px, 5vw, 22px); /* CHANGED from 4vw */
+  font-size: clamp(18px, 5vw, 22px);
   color: #333;
 }
-
 
 .modal label {
   display: block;
@@ -1071,20 +1069,33 @@ section h3 {
   color: #333;
 }
 
-
 .modal input,
 .modal select,
-.modal textarea { /* CHANGED - combined all types */
+.modal textarea {
   width: 100%;
+  max-width: 100%; /* ADDED */
   padding: 0.75rem;
-  font-size: 16px; /* CHANGED from clamp - prevents iOS zoom */
+  font-size: 16px;
   border-radius: 5px;
   border: 1px solid #ccc;
   margin-bottom: 1rem;
   box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif; /* ADDED */
+  font-family: 'Segoe UI', sans-serif;
+  -webkit-appearance: none; /* ADDED - removes Safari styling */
+  appearance: none; /* ADDED */
 }
 
+/* Specific fix for date and time inputs */
+.modal input[type="date"],
+.modal input[type="time"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  padding: 0.75rem !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
 
 .modal input:focus,
 .modal select:focus,
@@ -1094,60 +1105,53 @@ section h3 {
   box-shadow: 0 0 0 2px rgba(182, 148, 246, 0.1);
 }
 
-
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem; /* CHANGED from 0.625rem */
+  gap: 0.75rem;
   flex-wrap: wrap;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
-
 .modal-actions button {
-  padding: 0.75rem 1.5rem; /* CHANGED from 0.625rem 1rem */
+  padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 14px; /* CHANGED from clamp */
+  font-size: 14px;
+  min-width: 90px;
+  box-sizing: border-box;
   transition: all 0.2s;
-  min-width: 90px; /* CHANGED from 80px */
-  box-sizing: border-box; /* ADDED */
 }
-
 
 #add-task-confirm, #rename-task-confirm {
   background-color: #4CAF50;
   color: white;
 }
 
-
 #add-task-confirm:hover, #rename-task-confirm:hover {
   background-color: #45a049;
 }
-
 
 #delete-task-confirm {
   background-color: #e53935;
   color: white;
 }
 
-
 #delete-task-confirm:hover {
   background-color: #d32f2f;
 }
-
 
 .modal-actions button:not([id*="confirm"]) {
   background-color: #e5e7eb;
   color: #374151;
 }
 
-
 .modal-actions button:not([id*="confirm"]):hover {
   background-color: #d1d5db;
 }
+
 
 /* ========== FULLCALENDAR MOBILE OPTIMIZATION ========== */
 
