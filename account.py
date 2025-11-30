@@ -42,6 +42,7 @@ class UserSecurityAnswer(db.Model):
     user = db.relationship("User", back_populates="security_answers")
     question = db.relationship("SecurityQuestions", back_populates="answers")
 
+
 class CollaborativeList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
@@ -51,6 +52,17 @@ class CollaborativeList(db.Model):
     
     owner = db.relationship("User", backref="owned_lists")
     tasks = db.relationship("CollaborativeTask", back_populates="list", cascade="all, delete-orphan")
+
+
+class ListMember(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    list_id = db.Column(db.Integer, db.ForeignKey("collaborative_list.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.u_id"), nullable=False)
+    added_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    list = db.relationship("CollaborativeList", back_populates="members")
+    user = db.relationship("User")
+
 
 class CollaborativeTask(db.Model):
     id = db.Column(db.Integer, primary_key=True)
