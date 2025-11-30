@@ -505,20 +505,19 @@ body.auth-page {
     overflow: hidden;
   }
 
-    .nav-avatar {
+  .nav-avatar {
     width: 40px !important;
     height: 40px !important;
     font-size: 18px !important;
-    flex-shrink: 0;
+    flex-shrink: 0; /* ADDED */
   }
-  
-  .left-sidebar {
-    padding-right: 0.75rem !important; /* More padding on right */
-  }
-  
-  .bottom-nav {
-    flex-shrink: 0;
-    margin-right: 0.25rem;
+
+  .nav-profile-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
   }
 
   .parent {
@@ -533,7 +532,7 @@ body.auth-page {
     display: flex !important;
     visibility: visible !important;
     flex-direction: row !important;
-    padding: 0.5rem !important;
+    padding: 0.5rem 0.75rem 0.5rem 0.5rem !important; /* More padding on right */
     border-right: none !important;
     border-bottom: 1px solid #2b2b2b;
     justify-content: space-between !important;
@@ -556,24 +555,15 @@ body.auth-page {
     padding-top: 0 !important;
     border-top: none !important;
     margin-left: auto;
+    margin-right: 0.5rem; 
+    flex-shrink: 0; 
   }
-  
+
   /* Main content */
   .parent > div:last-child {
     overflow-y: auto;
     height: 100%;
     padding: 0;
-  }
-  
-  /* Mobile menu toggle */
-  .mobile-menu-btn {
-    display: block;
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 28px;
-    cursor: pointer;
-    padding: 0.5rem;
   }
   
   /* Mobile floating add button */

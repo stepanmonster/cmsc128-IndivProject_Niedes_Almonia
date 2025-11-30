@@ -652,11 +652,25 @@ function openSidebarOnMobile() {
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.querySelector('.sidebar-overlay');
     if (sidebar && overlay) {
-      sidebar.classList.add('mobile-visible');
+      sidebar.style.display = 'block';
+      sidebar.style.position = 'fixed';
+      sidebar.style.left = '0';
+      sidebar.style.zIndex = '999';
+      
       overlay.classList.add('active');
     }
   }
 }
+
+
+document.querySelector('.sidebar-overlay')?.addEventListener('click', function() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.querySelector('.sidebar-overlay');
+  if (sidebar && overlay) {
+    sidebar.style.left = '-100%';
+    overlay.classList.remove('active');
+  }
+});
 
 // Setup
 function setup() {
