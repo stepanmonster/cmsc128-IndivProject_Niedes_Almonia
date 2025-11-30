@@ -3,15 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
-
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.secret_key = "13c4f3f7e6f6ff70a262eae263c51b8c"
 
-
 db = SQLAlchemy(app)
-
 
 # ---------- MODELS ----------
 class User(db.Model):
@@ -31,12 +28,10 @@ class User(db.Model):
             "username": self.u_username
         }
 
-
 class SecurityQuestions(db.Model):
     q_id = db.Column(db.Integer, primary_key=True)
     q_content = db.Column(db.String(200), nullable=False)
     answers = db.relationship("UserSecurityAnswer", back_populates="question")
-
 
 class UserSecurityAnswer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,28 +42,16 @@ class UserSecurityAnswer(db.Model):
     user = db.relationship("User", back_populates="security_answers")
     question = db.relationship("SecurityQuestions", back_populates="answers")
 
-# to do list with collaboration feature
 class CollaborativeList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey("user.u_id"), nullable=False)
+    member_ids = db.Column(db.JSON, default=list)  # Store member user IDs as JSON array
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     owner = db.relationship("User", backref="owned_lists")
-    members = db.relationship("ListMember", back_populates="list", cascade="all, delete-orphan")
     tasks = db.relationship("CollaborativeTask", back_populates="list", cascade="all, delete-orphan")
 
-# member of collaborative list
-class ListMember(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    list_id = db.Column(db.Integer, db.ForeignKey("collaborative_list.id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.u_id"), nullable=False)
-    added_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    list = db.relationship("CollaborativeList", back_populates="members")
-    user = db.relationship("User")
-
-# class for collaborative tasks
 class CollaborativeTask(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     list_id = db.Column(db.Integer, db.ForeignKey("collaborative_list.id"), nullable=False)
@@ -91,7 +74,6 @@ class CollaborativeTask(db.Model):
             "createdAt": int(self.created_at.timestamp() * 1000),
         }
 
-
 # ---------- DB INIT ----------
 with app.app_context():
     db.create_all()
@@ -108,7 +90,6 @@ with app.app_context():
             db.session.add(SecurityQuestions(q_content=q))
         db.session.commit()
 
-
 # ---------- PAGE ROUTES ----------
 @app.route("/")
 def root():
@@ -116,11 +97,11 @@ def root():
         return redirect(url_for('index_page'))
     return render_template("login.html")
 
-
 @app.route("/login")
 def login_page():
+    if 'user_id' in session:
+        return redirect(url_for('index_page'))
     return render_template("login.html")
-
 
 @app.route("/index")
 def index_page():
@@ -128,18 +109,17 @@ def index_page():
         return redirect(url_for('login_page'))
     return render_template("main.html")
 
-
 @app.route("/settings")
 def settings_page():
     if 'user_id' not in session:
         return redirect(url_for('login_page'))
     return render_template("account-settings.html")
 
-
 @app.route('/forgotpassword')
 def forgot_password():
+    if 'user_id' in session:
+        return redirect(url_for('index_page'))
     return render_template('forgotpassword.html')
-
 
 # ---------- API ENDPOINTS ----------
 @app.get("/api/current-user")
@@ -153,7 +133,6 @@ def get_current_user():
         return jsonify({"error": "User not found"}), 404
     
     return jsonify(user.to_dict()), 200
-
 
 @app.post("/api/login")
 def login_user():
@@ -176,7 +155,6 @@ def login_user():
     
     session['user_id'] = user.u_id
     return jsonify({"message": "Login successful", "user": user.to_dict()}), 200
-
 
 @app.post("/api/user")
 def create_user():
@@ -228,7 +206,6 @@ def create_user():
     session['user_id'] = u.u_id
     return jsonify(u.to_dict()), 201
 
-
 @app.put("/api/user")
 def update_user():
     user_id = session.get('user_id')
@@ -265,7 +242,6 @@ def update_user():
     
     return jsonify({"message": "Profile updated successfully", "user": user.to_dict()}), 200
 
-
 @app.put("/api/user/password")
 def change_password():
     user_id = session.get('user_id')
@@ -296,7 +272,6 @@ def change_password():
     
     return jsonify({"message": "Password updated successfully"}), 200
 
-
 @app.delete("/api/user")
 def delete_user():
     user_id = session.get('user_id')
@@ -313,18 +288,15 @@ def delete_user():
     
     return jsonify({"message": "Account deleted"}), 200
 
-
 @app.post("/api/logout")
 def logout():
     session.pop('user_id', None)
     return jsonify({"message": "Logged out"}), 200
 
-
 @app.get("/api/security-questions")
 def get_security_questions():
     questions = SecurityQuestions.query.all()
     return jsonify([{"q_id": q.q_id, "q_content": q.q_content} for q in questions]), 200
-
 
 @app.post("/api/user/security-answers")
 def set_security_answers():
@@ -361,7 +333,6 @@ def set_security_answers():
     db.session.commit()
     return jsonify({"message": "Security answers saved successfully"}), 200
 
-
 @app.post("/api/user/verify-security-answer")
 def verify_security_answer():
     data = request.get_json(force=True)
@@ -384,7 +355,6 @@ def verify_security_answer():
         return jsonify({"message": "Answer verified", "user_id": user.u_id}), 200
     else:
         return jsonify({"error": "Incorrect answer"}), 401
-
 
 @app.post("/api/forgotpassword")
 def forgotpassword_api():
@@ -412,7 +382,6 @@ def forgotpassword_api():
         "question_id": question.q_id
     }), 200
 
-
 @app.post("/api/reset-password")
 def reset_password():
     data = request.get_json(force=True)
@@ -434,7 +403,6 @@ def reset_password():
     
     return jsonify({"message": "Password reset successful"}), 200
 
-
 # ---------- COLLABORATIVE LIST ROUTES ----------
 
 # Get all collaborative lists (owned + member of)
@@ -447,9 +415,10 @@ def get_collaborative_lists():
     # Lists owned by user
     owned_lists = CollaborativeList.query.filter_by(owner_id=user_id).all()
     
-    # Lists user is a member of
-    memberships = ListMember.query.filter_by(user_id=user_id).all()
-    member_lists = [m.list for m in memberships]
+    # Lists user is a member of - check if user_id is in member_ids array
+    all_lists = CollaborativeList.query.all()
+    member_lists = [lst for lst in all_lists 
+                    if lst.member_ids and user_id in lst.member_ids]
     
     result = []
     
@@ -460,7 +429,7 @@ def get_collaborative_lists():
             "name": lst.name,
             "owner": lst.owner.u_name,
             "is_owner": True,
-            "member_count": len(lst.members)
+            "member_count": len(lst.member_ids) if lst.member_ids else 0
         })
     
     # Add member lists
@@ -470,11 +439,10 @@ def get_collaborative_lists():
             "name": lst.name,
             "owner": lst.owner.u_name,
             "is_owner": False,
-            "member_count": len(lst.members)
+            "member_count": len(lst.member_ids) if lst.member_ids else 0
         })
     
     return jsonify(result), 200
-
 
 # Create collaborative list
 @app.post("/api/collaborative-lists")
@@ -489,7 +457,11 @@ def create_collaborative_list():
     if not name:
         return jsonify({"error": "List name is required"}), 400
     
-    new_list = CollaborativeList(name=name, owner_id=user_id)
+    new_list = CollaborativeList(
+        name=name, 
+        owner_id=user_id,
+        member_ids=[]
+    )
     db.session.add(new_list)
     db.session.commit()
     
@@ -497,9 +469,9 @@ def create_collaborative_list():
         "id": new_list.id,
         "name": new_list.name,
         "owner": new_list.owner.u_name,
-        "is_owner": True
+        "is_owner": True,
+        "member_count": 0
     }), 201
-
 
 # Rename collaborative list
 @app.put("/api/collaborative-lists/<int:list_id>")
@@ -527,7 +499,6 @@ def rename_collaborative_list(list_id):
     
     return jsonify({"message": "List renamed successfully"}), 200
 
-
 # Delete collaborative list
 @app.delete("/api/collaborative-lists/<int:list_id>")
 def delete_collaborative_list(list_id):
@@ -547,7 +518,6 @@ def delete_collaborative_list(list_id):
     db.session.commit()
     
     return jsonify({"message": "List deleted successfully"}), 200
-
 
 # Add member to collaborative list
 @app.post("/api/collaborative-lists/<int:list_id>/members")
@@ -579,22 +549,23 @@ def add_list_member(list_id):
     if member_user.u_id == collab_list.owner_id:
         return jsonify({"error": "Cannot add the list owner as a member"}), 400
     
+    # Initialize member_ids if None
+    if collab_list.member_ids is None:
+        collab_list.member_ids = []
+    
     # Check if already a member
-    existing = ListMember.query.filter_by(list_id=list_id, user_id=member_user.u_id).first()
-    if existing:
+    if member_user.u_id in collab_list.member_ids:
         return jsonify({"error": "User is already a member"}), 400
     
-    # Add member
-    new_member = ListMember(list_id=list_id, user_id=member_user.u_id)
-    db.session.add(new_member)
+    # Add member - create new list to trigger SQLAlchemy update
+    collab_list.member_ids = collab_list.member_ids + [member_user.u_id]
     db.session.commit()
     
     return jsonify({
-        "id": new_member.id,
+        "id": member_user.u_id,
         "username": member_user.u_username,
         "name": member_user.u_name
     }), 201
-
 
 # Get members of a collaborative list
 @app.get("/api/collaborative-lists/<int:list_id>/members")
@@ -603,15 +574,28 @@ def get_list_members(list_id):
     if not user_id:
         return jsonify({"error": "Not logged in"}), 401
     
-    members = ListMember.query.filter_by(list_id=list_id).all()
+    collab_list = CollaborativeList.query.get(list_id)
+    if not collab_list:
+        return jsonify({"error": "List not found"}), 404
+    
+    # Check if user has access
+    is_owner = collab_list.owner_id == user_id
+    is_member = collab_list.member_ids and user_id in collab_list.member_ids
+    
+    if not (is_owner or is_member):
+        return jsonify({"error": "Access denied"}), 403
+    
+    member_ids = collab_list.member_ids or []
+    if not member_ids:
+        return jsonify([]), 200
+    
+    members = User.query.filter(User.u_id.in_(member_ids)).all()
     
     return jsonify([{
-        "id": m.id,
-        "username": m.user.u_username,
-        "name": m.user.u_name,
-        "added_at": int(m.added_at.timestamp() * 1000)
+        "id": m.u_id,
+        "username": m.u_username,
+        "name": m.u_name
     } for m in members]), 200
-
 
 # Remove member from collaborative list
 @app.delete("/api/collaborative-lists/<int:list_id>/members/<int:member_id>")
@@ -621,18 +605,20 @@ def remove_list_member(list_id, member_id):
         return jsonify({"error": "Not logged in"}), 401
     
     collab_list = CollaborativeList.query.get(list_id)
-    if not collab_list or collab_list.owner_id != user_id:
+    if not collab_list:
+        return jsonify({"error": "List not found"}), 404
+    
+    # Only owner can remove members
+    if collab_list.owner_id != user_id:
         return jsonify({"error": "Unauthorized"}), 403
     
-    member = ListMember.query.get(member_id)
-    if not member:
-        return jsonify({"error": "Member not found"}), 404
+    if collab_list.member_ids and member_id in collab_list.member_ids:
+        # Create new list without the member_id
+        collab_list.member_ids = [mid for mid in collab_list.member_ids if mid != member_id]
+        db.session.commit()
+        return jsonify({"message": "Member removed"}), 200
     
-    db.session.delete(member)
-    db.session.commit()
-    
-    return jsonify({"message": "Member removed"}), 200
-
+    return jsonify({"error": "Member not found"}), 404
 
 # Get tasks for a collaborative list
 @app.get("/api/collaborative-lists/<int:list_id>/tasks")
@@ -647,14 +633,13 @@ def get_collaborative_tasks(list_id):
         return jsonify({"error": "List not found"}), 404
     
     is_owner = collab_list.owner_id == user_id
-    is_member = ListMember.query.filter_by(list_id=list_id, user_id=user_id).first() is not None
+    is_member = collab_list.member_ids and user_id in collab_list.member_ids
     
     if not (is_owner or is_member):
         return jsonify({"error": "Access denied"}), 403
     
     tasks = CollaborativeTask.query.filter_by(list_id=list_id).all()
     return jsonify([t.to_dict() for t in tasks]), 200
-
 
 # Create task in collaborative list
 @app.post("/api/collaborative-lists/<int:list_id>/tasks")
@@ -669,7 +654,7 @@ def create_collaborative_task(list_id):
         return jsonify({"error": "List not found"}), 404
     
     is_owner = collab_list.owner_id == user_id
-    is_member = ListMember.query.filter_by(list_id=list_id, user_id=user_id).first() is not None
+    is_member = collab_list.member_ids and user_id in collab_list.member_ids
     
     if not (is_owner or is_member):
         return jsonify({"error": "Access denied"}), 403
@@ -691,13 +676,23 @@ def create_collaborative_task(list_id):
     
     return jsonify(new_task.to_dict()), 201
 
-
 # Update collaborative task
 @app.put("/api/collaborative-lists/<int:list_id>/tasks/<int:task_id>")
 def update_collaborative_task(list_id, task_id):
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({"error": "Not logged in"}), 401
+    
+    # Check access
+    collab_list = CollaborativeList.query.get(list_id)
+    if not collab_list:
+        return jsonify({"error": "List not found"}), 404
+    
+    is_owner = collab_list.owner_id == user_id
+    is_member = collab_list.member_ids and user_id in collab_list.member_ids
+    
+    if not (is_owner or is_member):
+        return jsonify({"error": "Access denied"}), 403
     
     task = CollaborativeTask.query.filter_by(id=task_id, list_id=list_id).first()
     if not task:
@@ -716,13 +711,23 @@ def update_collaborative_task(list_id, task_id):
     db.session.commit()
     return jsonify(task.to_dict()), 200
 
-
 # Delete collaborative task
 @app.delete("/api/collaborative-lists/<int:list_id>/tasks/<int:task_id>")
 def delete_collaborative_task(list_id, task_id):
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({"error": "Not logged in"}), 401
+    
+    # Check access
+    collab_list = CollaborativeList.query.get(list_id)
+    if not collab_list:
+        return jsonify({"error": "List not found"}), 404
+    
+    is_owner = collab_list.owner_id == user_id
+    is_member = collab_list.member_ids and user_id in collab_list.member_ids
+    
+    if not (is_owner or is_member):
+        return jsonify({"error": "Access denied"}), 403
     
     task = CollaborativeTask.query.filter_by(id=task_id, list_id=list_id).first()
     if not task:
@@ -733,10 +738,7 @@ def delete_collaborative_task(list_id, task_id):
     
     return "", 204
 
-
-# Import app.py to register task routes
 from app import *
-
 
 if __name__ == "__main__":
     app.run(debug=True)
