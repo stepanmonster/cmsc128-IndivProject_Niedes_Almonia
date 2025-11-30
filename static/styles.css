@@ -1288,3 +1288,29 @@ section h3 {
   box-shadow: 0 4px 8px rgba(139, 92, 246, 0.4);
 }
 
+/* Base style for collab list modal buttons */
+.collab-modal-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* Green: create / rename collab list */
+.collab-modal-ok {
+  background: #22c55e;
+  color: #fff;
+}
+.collab-modal-ok:hover {
+  background: #16a34a;
+}
+
+/* Red: delete collab list */
+.collab-modal-danger {
+  background: #ef4444;
+  color: #fff;
+}
+.collab-modal-danger:hover {
+  background: #dc2626;
+}
