@@ -412,14 +412,22 @@ body.auth-page {
 }
 
 @media (max-width: 768px) {
+  /* Force proper viewport */
+  body {
+    overflow: hidden;
+  }
+  
   .parent {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
+    width: 100vw;
     height: 100vh;
     overflow: hidden;
   }
   
   .left-sidebar {
+    display: flex !important;
+    visibility: visible !important;
     flex-direction: row !important;
     padding: 0.5rem !important;
     border-right: none !important;
@@ -446,14 +454,14 @@ body.auth-page {
     margin-left: auto;
   }
   
-  /* Main content should fill remaining space */
+  /* Main content */
   .parent > div:last-child {
     overflow-y: auto;
     height: 100%;
-    padding: 1rem;
+    padding: 0;
   }
   
-  /* Mobile menu toggle button */
+  /* Mobile menu toggle */
   .mobile-menu-btn {
     display: block;
     background: transparent;
@@ -493,7 +501,7 @@ body.auth-page {
     box-shadow: 0 6px 16px rgba(182, 148, 246, 0.6);
   }
   
-  /* Sidebar overlay for mobile */
+  /* Sidebar overlay */
   .sidebar-overlay {
     display: none;
     position: fixed;
@@ -509,7 +517,7 @@ body.auth-page {
     display: block;
   }
   
-  /* Sidebar slides in from left on mobile */
+  /* Sidebar slides in */
   .sidebar {
     display: block;
     position: fixed;
@@ -527,8 +535,14 @@ body.auth-page {
     left: 0;
   }
   
-  /* Modal improvements for mobile */
+  /* Modal fixes */
+  .modal-overlay {
+    padding: 0.5rem;
+  }
+  
   .modal {
+    width: calc(100vw - 2rem);
+    max-width: 500px;
     padding: 1.25rem;
   }
   
@@ -549,19 +563,29 @@ body.auth-page {
     margin-top: 1rem;
   }
   
-  /* Calendar optimizations */
+  /* Calendar fixes */
   .calendar {
     padding: 0;
     margin: 0;
-    border-radius: 0;
-    height: 100%;
     width: 100%;
-    overflow: hidden;
+    height: 100%;
+    overflow: auto;
+    box-sizing: border-box;
   }
   
   #calendar {
     width: 100%;
+    min-width: 100%;
     height: 100%;
+  }
+  
+  .fc {
+    width: 100% !important;
+    max-width: 100vw !important;
+  }
+  
+  .fc-view-harness {
+    width: 100% !important;
   }
   
   .fc-toolbar {
@@ -599,13 +623,6 @@ body.auth-page {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-}
-
-
-@media (max-width: 1024px) {
-  .parent {
-    grid-template-columns: 60px minmax(250px, 30vw) 1fr;
   }
 }
 
@@ -913,12 +930,14 @@ section h3 {
   justify-content: center;
   z-index: 9999;
   padding: 1rem;
-  overflow-y: auto; 
+  overflow-y: auto;
+  box-sizing: border-box; /* ADDED */
 }
+
 
 .modal {
   background-color: white;
-  padding: 1.25rem;
+  padding: 1.5rem; /* CHANGED from 1.25rem */
   border-radius: 10px;
   width: 100%;
   max-width: 400px;
@@ -928,14 +947,17 @@ section h3 {
   gap: 0.75rem;
   max-height: 90vh;
   overflow-y: auto;
-  margin: auto; 
+  margin: auto;
+  box-sizing: border-box; /* ADDED */
 }
+
 
 .modal h2 {
   margin: 0 0 1rem 0;
-  font-size: clamp(18px, 4vw, 22px);
+  font-size: clamp(18px, 5vw, 22px); /* CHANGED from 4vw */
   color: #333;
 }
+
 
 .modal label {
   display: block;
@@ -945,18 +967,20 @@ section h3 {
   color: #333;
 }
 
-.modal input[type="text"],
-.modal input[type="date"],
-.modal input[type="time"],
-.modal select {
+
+.modal input,
+.modal select,
+.modal textarea { /* CHANGED - combined all types */
+  width: 100%;
   padding: 0.75rem;
-  font-size: clamp(14px, 3vw, 16px);
+  font-size: 16px; /* CHANGED from clamp - prevents iOS zoom */
   border-radius: 5px;
   border: 1px solid #ccc;
-  width: 100%;
+  margin-bottom: 1rem;
   box-sizing: border-box;
-  margin-bottom: 1rem; /* Space between fields */
+  font-family: 'Segoe UI', sans-serif; /* ADDED */
 }
+
 
 .modal input:focus,
 .modal select:focus,
@@ -966,47 +990,56 @@ section h3 {
   box-shadow: 0 0 0 2px rgba(182, 148, 246, 0.1);
 }
 
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.625rem;
+  gap: 0.75rem; /* CHANGED from 0.625rem */
   flex-wrap: wrap;
-  margin-top: 1rem; /* Changed from 0.5rem to 1rem */
+  margin-top: 1rem;
 }
 
+
 .modal-actions button {
-  padding: 0.625rem 1rem;
+  padding: 0.75rem 1.5rem; /* CHANGED from 0.625rem 1rem */
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  font-size: clamp(13px, 3vw, 14px);
+  font-size: 14px; /* CHANGED from clamp */
   transition: all 0.2s;
-  min-width: 80px;
+  min-width: 90px; /* CHANGED from 80px */
+  box-sizing: border-box; /* ADDED */
 }
+
 
 #add-task-confirm, #rename-task-confirm {
   background-color: #4CAF50;
   color: white;
 }
 
+
 #add-task-confirm:hover, #rename-task-confirm:hover {
   background-color: #45a049;
 }
+
 
 #delete-task-confirm {
   background-color: #e53935;
   color: white;
 }
 
+
 #delete-task-confirm:hover {
   background-color: #d32f2f;
 }
+
 
 .modal-actions button:not([id*="confirm"]) {
   background-color: #e5e7eb;
   color: #374151;
 }
+
 
 .modal-actions button:not([id*="confirm"]):hover {
   background-color: #d1d5db;
