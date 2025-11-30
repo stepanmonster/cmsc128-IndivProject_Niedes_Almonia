@@ -770,8 +770,8 @@ section h3 {
 }
 
 .modal h2 {
-  margin: 0 0 0.75rem 0; 
-  font-size: clamp(16px, 4vw, 20px);
+  margin: 0 0 1rem 0;
+  font-size: clamp(18px, 4vw, 22px);
   color: #333;
 }
 
@@ -786,18 +786,15 @@ section h3 {
 .modal input[type="text"],
 .modal input[type="date"],
 .modal input[type="time"],
-.modal select,
-.modal textarea {
-  padding: 0.625rem;
-  font-size: clamp(13px, 3vw, 14px);
+.modal select {
+  padding: 0.75rem;
+  font-size: clamp(14px, 3vw, 16px);
   border-radius: 5px;
   border: 1px solid #ccc;
   width: 100%;
   box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
-  margin-bottom: 0.75rem; /* Add spacing between fields */
+  margin-bottom: 1rem; /* Space between fields */
 }
-
 
 .modal input:focus,
 .modal select:focus,
@@ -812,7 +809,7 @@ section h3 {
   justify-content: flex-end;
   gap: 0.625rem;
   flex-wrap: wrap;
-  margin-top: 0.5rem;
+  margin-top: 1rem; /* Changed from 0.5rem to 1rem */
 }
 
 .modal-actions button {
@@ -938,6 +935,28 @@ section h3 {
   
   .sidebar.mobile-visible {
     left: 0;
+  }
+  
+  /* Modal improvements for mobile */
+  .modal {
+    padding: 1.25rem;
+  }
+  
+  .modal input[type="text"],
+  .modal input[type="date"],
+  .modal input[type="time"],
+  .modal select {
+    padding: 0.875rem;
+    font-size: 16px; /* Prevents iOS zoom */
+    margin-bottom: 1.25rem; /* Space between fields */
+  }
+  
+  .modal h2 {
+    margin: 0 0 1rem 0;
+  }
+  
+  .modal-actions {
+    margin-top: 1rem;
   }
 }
 
