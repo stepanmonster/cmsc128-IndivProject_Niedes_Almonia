@@ -1,6 +1,7 @@
 # cmsc128-IndivProject_Niedes_Almonia
 
 # To-Do Web App
+The To-Do Web App can be accessed online at sgniedes.pythonanywhere.com
 
 ## Backend Chosen
 This project uses **Flask** (Python) as the backend framework with **SQLite** as the database, managed through **SQLAlchemy**.
@@ -59,7 +60,5 @@ Here are some example endpoints that the frontend can use to interact with the d
   ```
   DELETE /api/collaborative-lists/<list_id>
   ```
-  
-  
 
 These endpoints allow the frontend to retrieve, insert, and remove data from the SQLite database through the Flask backend.
